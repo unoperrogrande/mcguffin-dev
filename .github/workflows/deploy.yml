@@ -28,3 +28,4 @@ jobs:
           remote_host: ${{ secrets.SSH_HOST }}
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_KEY }}
+rsh: "ssh -q -o StrictHostKeyChecking=no"
