@@ -18,7 +18,10 @@ jobs:
 
       - name: Build
         run: npm run build
-        
+        env:
+          VITE_SF_CLIENT_ID: ${{ secrets.VITE_SF_CLIENT_ID }}
+          VITE_SF_LOGIN_URL: ${{ secrets.VITE_SF_LOGIN_URL }}
+
       - name: Deploy via SSH
         run: |
           mkdir -p ~/.ssh
