@@ -137,7 +137,7 @@ export default function BankerPOC() {
           window.history.replaceState({}, '', '/BankerPOC')
           setAuthed(true)
         } catch (e) {
-          setError('Login failed. Please try again.')
+          setError(`Login failed: ${e.message}`)
           setLoading(false)
           return
         }
