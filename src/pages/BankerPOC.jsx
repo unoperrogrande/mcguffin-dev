@@ -190,6 +190,17 @@ export default function BankerPOC() {
     </div>
   )
 
+  if (error) return (
+    <div className="banker-poc">
+      <div className="poc-state">
+        <p className="error-msg">{error}</p>
+        <button className="login-btn" onClick={initiateLogin}>
+          Try Again
+        </button>
+      </div>
+    </div>
+  )
+
   if (!authed) return (
     <div className="banker-poc">
       <div className="poc-state">
@@ -197,17 +208,6 @@ export default function BankerPOC() {
         <p>Connect your Salesforce org to get started.</p>
         <button className="login-btn" onClick={initiateLogin}>
           Login with Salesforce
-        </button>
-      </div>
-    </div>
-  )
-
-  if (error) return (
-    <div className="banker-poc">
-      <div className="poc-state">
-        <p className="error-msg">{error}</p>
-        <button className="login-btn" onClick={initiateLogin}>
-          Try Again
         </button>
       </div>
     </div>
