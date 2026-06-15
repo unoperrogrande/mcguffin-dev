@@ -44,7 +44,7 @@ export const handleCallback = async (code) => {
     code,
     code_verifier: verifier,
   })
-  const response = await fetch(`${SF_LOGIN_URL}/services/oauth2/token`, {
+  const response = await fetch('/sf-oauth-token.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params,
