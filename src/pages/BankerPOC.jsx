@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, Fragment } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { initiateLogin, handleCallback, isAuthenticated, logout } from '../utils/auth'
 import { fetchOpportunities, createTask } from '../utils/salesforce'
 import './BankerPOC.css'
@@ -47,6 +47,29 @@ const getGroup = (opp) => {
   return 'older'
 }
 
+const sortOppList = (list, sortConfig) => {
+  if (!sortConfig.field) return list
+  return [...list].sort((a, b) => {
+    let aVal, bVal
+    if (sortConfig.field === 'name') {
+      aVal = a.accountName.toLowerCase()
+      bVal = b.accountName.toLowerCase()
+    } else if (sortConfig.field === 'stage') {
+      aVal = a.stage.toLowerCase()
+      bVal = b.stage.toLowerCase()
+    } else if (sortConfig.field === 'lastContact') {
+      aVal = getDiffDays(maxDate(a.lastEmailDate, a.lastTextDate, a.lastCallDate))
+      bVal = getDiffDays(maxDate(b.lastEmailDate, b.lastTextDate, b.lastCallDate))
+    } else if (sortConfig.field === 'lastContactType') {
+      aVal = getLastContactType(a).toLowerCase()
+      bVal = getLastContactType(b).toLowerCase()
+    }
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
+    return 0
+  })
+}
+
 // ─── Group Config ──────────────────────────────────────────
 const GROUP_CONFIG = {
   today: { label: 'Contacted Today',            color: '#22c55e' },
@@ -86,14 +109,62 @@ function OppRow({ opp, flash, onContact }) {
   )
 }
 
+// ─── Group Table ───────────────────────────────────────────
+function GroupTable({ groupKey, opps, onContact, flashMap }) {
+  const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' })
+  const config = GROUP_CONFIG[groupKey]
+
+  const handleSort = (field) => {
+    setSortConfig(prev => ({
+      field,
+      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
+
+  const SortIcon = ({ field }) => (
+    <span className={`sort-icon${sortConfig.field === field ? ' sort-icon-active' : ''}`}>
+      {sortConfig.field === field ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : ' ↕'}
+    </span>
+  )
+
+  return (
+    <section className="group-section">
+      <div className="group-header" style={{ borderColor: config.color }}>
+        <span className="group-title" style={{ color: config.color }}>{config.label}</span>
+        <span className="group-count" style={{ background: config.color }}>{opps.length}</span>
+      </div>
+      <table className="pipeline-table">
+        <thead>
+          <tr>
+            <th onClick={() => handleSort('name')}>Name<SortIcon field="name" /></th>
+            <th onClick={() => handleSort('stage')}>Stage<SortIcon field="stage" /></th>
+            <th onClick={() => handleSort('lastContact')}>Last Contact<SortIcon field="lastContact" /></th>
+            <th onClick={() => handleSort('lastContactType')}>Last Contact Type<SortIcon field="lastContactType" /></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortOppList(opps, sortConfig).map(opp => (
+            <OppRow
+              key={opp.id}
+              opp={opp}
+              flash={flashMap[opp.id]}
+              onContact={onContact}
+            />
+          ))}
+        </tbody>
+      </table>
+    </section>
+  )
+}
+
 // ─── Main Page ─────────────────────────────────────────────
 export default function BankerPOC() {
-  const [opps, setOpps]             = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [error, setError]           = useState(null)
-  const [authed, setAuthed]         = useState(isAuthenticated())
-  const [flashMap, setFlashMap]     = useState({})
-  const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' })
+  const [opps, setOpps]         = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [error, setError]       = useState(null)
+  const [authed, setAuthed]     = useState(isAuthenticated())
+  const [flashMap, setFlashMap] = useState({})
 
   useEffect(() => {
     const init = async () => {
@@ -148,42 +219,6 @@ export default function BankerPOC() {
     }
   }
 
-  const handleSort = (field) => {
-    setSortConfig(prev => ({
-      field,
-      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
-    }))
-  }
-
-  const sortOpps = (list) => {
-    if (!sortConfig.field) return list
-    return [...list].sort((a, b) => {
-      let aVal, bVal
-      if (sortConfig.field === 'name') {
-        aVal = a.accountName.toLowerCase()
-        bVal = b.accountName.toLowerCase()
-      } else if (sortConfig.field === 'stage') {
-        aVal = a.stage.toLowerCase()
-        bVal = b.stage.toLowerCase()
-      } else if (sortConfig.field === 'lastContact') {
-        aVal = getDiffDays(maxDate(a.lastEmailDate, a.lastTextDate, a.lastCallDate))
-        bVal = getDiffDays(maxDate(b.lastEmailDate, b.lastTextDate, b.lastCallDate))
-      } else if (sortConfig.field === 'lastContactType') {
-        aVal = getLastContactType(a).toLowerCase()
-        bVal = getLastContactType(b).toLowerCase()
-      }
-      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
-      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
-      return 0
-    })
-  }
-
-  const SortIcon = ({ field }) => (
-    <span className={`sort-icon${sortConfig.field === field ? ' sort-icon-active' : ''}`}>
-      {sortConfig.field === field ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : ' ↕'}
-    </span>
-  )
-
   const grouped = useMemo(() => {
     const groups = { today: [], week: [], month: [], older: [] }
     opps.forEach(opp => groups[getGroup(opp)].push(opp))
@@ -227,42 +262,17 @@ export default function BankerPOC() {
         </button>
       </header>
       <main className="poc-main">
-        <table className="pipeline-table">
-          <thead>
-            <tr>
-              <th onClick={() => handleSort('name')}>Name<SortIcon field="name" /></th>
-              <th onClick={() => handleSort('stage')}>Stage<SortIcon field="stage" /></th>
-              <th onClick={() => handleSort('lastContact')}>Last Contact<SortIcon field="lastContact" /></th>
-              <th onClick={() => handleSort('lastContactType')}>Last Contact Type<SortIcon field="lastContactType" /></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {['today', 'week', 'month', 'older'].map(key => {
-              const group  = grouped[key]
-              if (!group.length) return null
-              const config = GROUP_CONFIG[key]
-              return (
-                <Fragment key={key}>
-                  <tr className="group-row">
-                    <td colSpan={5}>
-                      <span style={{ color: config.color }}>{config.label}</span>
-                      <span className="group-count" style={{ background: config.color }}>{group.length}</span>
-                    </td>
-                  </tr>
-                  {sortOpps(group).map(opp => (
-                    <OppRow
-                      key={opp.id}
-                      opp={opp}
-                      flash={flashMap[opp.id]}
-                      onContact={handleContact}
-                    />
-                  ))}
-                </Fragment>
-              )
-            })}
-          </tbody>
-        </table>
+        {['older', 'month', 'week', 'today'].map(key =>
+          grouped[key].length > 0 && (
+            <GroupTable
+              key={key}
+              groupKey={key}
+              opps={grouped[key]}
+              onContact={handleContact}
+              flashMap={flashMap}
+            />
+          )
+        )}
       </main>
     </div>
   )
