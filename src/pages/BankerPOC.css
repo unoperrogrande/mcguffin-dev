@@ -6,15 +6,18 @@
 }
 
 .poc-header {
-  padding: 48px 40px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 40px;
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
   border-bottom: 1px solid #1e293b;
 }
 
 .poc-greeting {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 900;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .poc-greeting span {
@@ -26,144 +29,155 @@
 
 .poc-subtitle {
   color: #64748b;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .poc-main {
-  padding: 40px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px 32px 40px;
 }
 
-.group-section {
-  margin-bottom: 48px;
+/* ─── Table ──────────────────────────────────────────── */
+
+.pipeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
 }
 
-.group-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-left: 4px solid;
-  padding-left: 16px;
-  margin-bottom: 20px;
+.pipeline-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.group-title {
-  font-size: 1.25rem;
+.pipeline-table thead th {
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 0.72rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid #334155;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pipeline-table thead th:hover {
+  background: #273548;
+  color: #e2e8f0;
+}
+
+.pipeline-table thead th:last-child {
+  cursor: default;
+}
+
+.sort-icon {
+  color: #334155;
+  font-size: 0.8rem;
+}
+
+.sort-icon-active {
+  color: #6366f1;
+}
+
+/* ─── Group Row ──────────────────────────────────────── */
+
+.group-row td {
+  background: #0d1117;
+  padding: 10px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-top: 2px solid #1e293b;
+  border-bottom: 1px solid #1e293b;
 }
 
 .group-count {
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 10px;
+  display: inline-block;
+  margin-left: 10px;
+  padding: 1px 8px;
   border-radius: 999px;
-}
-
-.group-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.opp-card {
-  background: #1a1a2e;
-  border: 1px solid #1e293b;
-  border-radius: 12px;
-  padding: 20px;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-.opp-card:hover {
-  transform: translateY(-2px);
-  border-color: #6366f1;
-}
-
-.opp-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  gap: 8px;
-}
-
-.opp-account {
-  font-size: 1.1rem;
+  font-size: 0.68rem;
+  color: #fff;
   font-weight: 700;
-  color: #f1f5f9;
+  vertical-align: middle;
 }
 
-.opp-stage {
-  font-size: 0.7rem;
+/* ─── Data Rows ──────────────────────────────────────── */
+
+.opp-row td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1a2233;
+  vertical-align: middle;
+  color: #cbd5e1;
+}
+
+.opp-row:hover td {
+  background: #131c2e;
+}
+
+.col-name {
+  font-weight: 600;
+  color: #f1f5f9 !important;
+  white-space: nowrap;
+}
+
+.stage-badge {
+  font-size: 0.68rem;
   color: #a78bfa;
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(99, 102, 241, 0.12);
   border: 1px solid rgba(99, 102, 241, 0.3);
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
   white-space: nowrap;
 }
 
-.opp-meta {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+.col-last-contact {
+  color: #64748b !important;
 }
 
-.opp-meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.meta-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #475569;
-}
-
-.meta-value {
-  font-size: 0.9rem;
-  color: #e2e8f0;
+.col-contact-type {
   font-weight: 600;
 }
 
-.contact-type-email { color: #3b82f6; }
-.contact-type-text  { color: #22c55e; }
-.contact-type-call  { color: #f59e0b; }
+.contact-type-email { color: #3b82f6 !important; }
+.contact-type-text  { color: #22c55e !important; }
+.contact-type-call  { color: #f59e0b !important; }
+.contact-type-none  { color: #334155 !important; }
 
-.opp-actions {
+/* ─── Action Buttons ─────────────────────────────────── */
+
+.col-actions { white-space: nowrap; }
+
+.actions-wrap {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .action-btn {
-  flex: 1;
-  padding: 8px 4px;
+  padding: 5px 14px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.5px;
+  transition: all 0.15s;
+  letter-spacing: 0.3px;
 }
 
-.action-btn-email { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
-.action-btn-text  { background: rgba(34,197,94,0.2);  color: #22c55e; border: 1px solid rgba(34,197,94,0.4); }
-.action-btn-call  { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.4); }
+.action-btn-email { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.35); }
+.action-btn-text  { background: rgba(34,197,94,0.15);  color: #22c55e; border: 1px solid rgba(34,197,94,0.35);  }
+.action-btn-call  { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.35); }
 
-.action-btn:hover      { filter: brightness(1.3); transform: translateY(-1px); }
-.action-btn-flash      { filter: brightness(1.5); transform: scale(1.05); }
-.poc-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 48px 40px 32px;
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
-  border-bottom: 1px solid #1e293b;
-}
+.action-btn:hover  { filter: brightness(1.35); transform: translateY(-1px); }
+.action-btn-flash  { filter: brightness(1.6); }
+
+/* ─── States (loading / login / error) ──────────────── */
 
 .poc-state {
   display: flex;
@@ -211,6 +225,4 @@
   border-color: #475569;
 }
 
-.error-msg {
-  color: #ef4444;
-}
+.error-msg { color: #ef4444; }
