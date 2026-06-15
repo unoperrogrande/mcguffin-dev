@@ -160,7 +160,8 @@ export default function BankerPOC() {
   }, [])
 
   const handleContact = async (id, type) => {
-    const t = todayStr()
+    const t       = todayStr()
+    const ownerId = opps.find(o => o.id === id)?.ownerId
     setOpps(prev => prev.map(opp => {
       if (opp.id !== id) return opp
       return {
@@ -172,7 +173,7 @@ export default function BankerPOC() {
       }
     }))
     try {
-      await createTask(id, type, t)
+      await createTask(id, ownerId, type, t)
     } catch (e) {
       console.error('Failed to update Salesforce:', e)
     }

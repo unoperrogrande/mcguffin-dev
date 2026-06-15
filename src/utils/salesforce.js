@@ -21,7 +21,7 @@ const apiCall = async (path, options = {}) => {
 
 export const fetchOpportunities = async () => {
   const query = encodeURIComponent(`
-    SELECT Id, Name, Account.Name, StageName,
+    SELECT Id, Name, Account.Name, StageName, OwnerId,
            LastEmailDate__c, LastTextDate__c, LastCallDate__c, LastContactedDate__c
     FROM Opportunity
     WHERE OwnerId = '${BANKER_USER_ID}'
@@ -30,6 +30,7 @@ export const fetchOpportunities = async () => {
   const data = await apiCall(`/services/data/v59.0/query?q=${query}`)
   return data.records.map(r => ({
     id: r.Id,
+    ownerId: r.OwnerId,
     accountName: r.Account?.Name || r.Name,
     stage: r.StageName,
     lastEmailDate: r.LastEmailDate__c,
@@ -38,12 +39,13 @@ export const fetchOpportunities = async () => {
   }))
 }
 
-export const createTask = async (oppId, type, dateStr) => {
+export const createTask = async (oppId, ownerId, type, dateStr) => {
   await apiCall('/services/data/v59.0/sobjects/Task', {
     method: 'POST',
     body: JSON.stringify({
       Subject:      type,
       WhatId:       oppId,
+      OwnerId:      ownerId,
       Status:       'Completed',
       ActivityDate: dateStr,
     }),
