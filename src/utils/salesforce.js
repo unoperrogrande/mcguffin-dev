@@ -39,13 +39,13 @@ export const fetchOpportunities = async () => {
   }))
 }
 
-export const createTask = async (oppId, ownerId, type, dateStr) => {
+export const createTask = async (oppId, type, dateStr) => {
   await apiCall('/services/data/v59.0/sobjects/Task', {
     method: 'POST',
     body: JSON.stringify({
       Subject:      type,
       WhatId:       oppId,
-      OwnerId:      ownerId,
+      OwnerId:      BANKER_USER_ID,
       Status:       'Completed',
       ActivityDate: dateStr,
     }),
