@@ -28,6 +28,7 @@ const getDiffDays = (dateStr) => {
 }
 
 const getLastContactType = (opp) => {
+  if (opp.lastContactType) return opp.lastContactType
   const candidates = [
     { type: 'Email', date: opp.lastEmailDate },
     { type: 'Text',  date: opp.lastTextDate  },
@@ -164,9 +165,10 @@ export default function BankerPOC() {
       if (opp.id !== id) return opp
       return {
         ...opp,
-        lastEmailDate: type === 'Email' ? t : opp.lastEmailDate,
-        lastTextDate:  type === 'Text'  ? t : opp.lastTextDate,
-        lastCallDate:  type === 'Call'  ? t : opp.lastCallDate,
+        lastEmailDate:   type === 'Email' ? t : opp.lastEmailDate,
+        lastTextDate:    type === 'Text'  ? t : opp.lastTextDate,
+        lastCallDate:    type === 'Call'  ? t : opp.lastCallDate,
+        lastContactType: type,
       }
     }))
     try {
