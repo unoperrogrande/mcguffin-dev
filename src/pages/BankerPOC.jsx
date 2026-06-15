@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { initiateLogin, handleCallback, isAuthenticated, logout } from '../utils/auth'
-import { fetchOpportunities, updateContactDate } from '../utils/salesforce'
+import { fetchOpportunities, createTask } from '../utils/salesforce'
 import './BankerPOC.css'
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -170,7 +170,7 @@ export default function BankerPOC() {
       }
     }))
     try {
-      await updateContactDate(id, type, t)
+      await createTask(id, type, t)
     } catch (e) {
       console.error('Failed to update Salesforce:', e)
     }

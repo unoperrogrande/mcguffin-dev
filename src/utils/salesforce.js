@@ -38,6 +38,18 @@ export const fetchOpportunities = async () => {
   }))
 }
 
+export const createTask = async (oppId, type, dateStr) => {
+  await apiCall('/services/data/v59.0/sobjects/Task', {
+    method: 'POST',
+    body: JSON.stringify({
+      Subject:      type,
+      WhatId:       oppId,
+      Status:       'Completed',
+      ActivityDate: dateStr,
+    }),
+  })
+}
+
 export const updateContactDate = async (oppId, type, dateStr) => {
   const fieldMap = {
     Email: 'LastEmailDate__c',
