@@ -98,7 +98,7 @@ function OppRow({ opp, flash, onContact, even }) {
             <button
               key={type}
               className={`action-btn action-btn-${type.toLowerCase()}${flash === type ? ' action-btn-flash' : ''}`}
-              onClick={() => onContact(opp.id, type)}
+              onClick={() => onContact(opp.id, opp.accountName, type)}
             >
               {flash === type ? '✓' : type}
             </button>
@@ -106,6 +106,41 @@ function OppRow({ opp, flash, onContact, even }) {
         </div>
       </td>
     </tr>
+  )
+}
+
+// ─── Contact Modal ─────────────────────────────────────────
+const MODAL_HEADER = { Email: 'Email', Text: 'Text', Call: 'Call Notes' }
+
+function ContactModal({ accountName, type, onSubmit, onClose }) {
+  const [notes, setNotes] = useState('')
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') onClose()
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) onSubmit(notes)
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} onKeyDown={handleKeyDown}>
+        <div className="modal-header">
+          <h3>{MODAL_HEADER[type]}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <p className="modal-opp-name">{accountName}</p>
+        <textarea
+          className="modal-textarea"
+          placeholder="Add notes..."
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          autoFocus
+        />
+        <div className="modal-footer">
+          <button className="modal-btn modal-cancel" onClick={onClose}>Cancel</button>
+          <button className="modal-btn modal-submit" onClick={() => onSubmit(notes)}>Submit</button>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -166,6 +201,7 @@ export default function BankerPOC() {
   const [error, setError]       = useState(null)
   const [authed, setAuthed]     = useState(isAuthenticated())
   const [flashMap, setFlashMap] = useState({})
+  const [modal, setModal]       = useState(null)
 
   useEffect(() => {
     const init = async () => {
@@ -199,7 +235,7 @@ export default function BankerPOC() {
     init()
   }, [])
 
-  const handleContact = async (id, type) => {
+  const handleContact = async (id, type, notes = '') => {
     const t = todayStr()
     setFlashMap(prev => ({ ...prev, [id]: type }))
     setTimeout(() => setFlashMap(prev => { const n = { ...prev }; delete n[id]; return n }), 1500)
@@ -214,10 +250,20 @@ export default function BankerPOC() {
       }
     }))
     try {
-      await createTask(id, type, t)
+      await createTask(id, type, t, notes)
     } catch (e) {
       console.error('Failed to update Salesforce:', e)
     }
+  }
+
+  const handleButtonClick = (id, accountName, type) => {
+    setModal({ id, accountName, type })
+  }
+
+  const handleModalSubmit = (notes) => {
+    const { id, type } = modal
+    setModal(null)
+    handleContact(id, type, notes)
   }
 
   const grouped = useMemo(() => {
@@ -269,12 +315,20 @@ export default function BankerPOC() {
               key={key}
               groupKey={key}
               opps={grouped[key]}
-              onContact={handleContact}
+              onContact={handleButtonClick}
               flashMap={flashMap}
             />
           )
         )}
       </main>
+      {modal && (
+        <ContactModal
+          accountName={modal.accountName}
+          type={modal.type}
+          onSubmit={handleModalSubmit}
+          onClose={() => setModal(null)}
+        />
+      )}
     </div>
   )
 }

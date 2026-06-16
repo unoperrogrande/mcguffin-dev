@@ -201,6 +201,110 @@ body:has(.banker-poc) #root {
 .action-btn:hover  { filter: brightness(1.35); transform: translateY(-1px); }
 .action-btn-flash  { filter: brightness(1.6); }
 
+/* ─── Contact Modal ──────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  width: 480px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #9ca3af;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close:hover { color: #374151; }
+
+.modal-opp-name {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.modal-textarea {
+  width: 100%;
+  height: 120px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #111827;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.modal-textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.modal-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.modal-cancel:hover { background: #e9eaec; }
+
+.modal-submit {
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  color: #fff;
+}
+
+.modal-submit:hover { opacity: 0.9; }
+
 /* ─── States (loading / login / error) ──────────────── */
 
 .poc-state {
