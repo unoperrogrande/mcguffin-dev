@@ -22,25 +22,10 @@ jobs:
           VITE_SF_CLIENT_ID: ${{ secrets.VITE_SF_CLIENT_ID }}
           VITE_SF_LOGIN_URL: ${{ secrets.VITE_SF_LOGIN_URL }}
 
-      - name: Package build
-        run: tar -czf deploy.tar.gz -C dist .
-
-      - name: Upload to cPanel
+      - name: Deploy via SSH
         run: |
-          RESPONSE=$(curl -sk -X POST "https://${{ secrets.SSH_HOST }}:2083/execute/Fileman/upload_files" \
-            -H "Authorization: cpanel ${{ secrets.SSH_USER }}:${{ secrets.CPANEL_TOKEN }}" \
-            -F "dir=/home/${{ secrets.SSH_USER }}/public_html/mcguffin.dev" \
-            -F "file-1=@deploy.tar.gz" \
-            -F "overwrite=1")
-          echo "$RESPONSE"
-          echo "$RESPONSE" | grep -q '"status":1' || (echo "Upload failed" && exit 1)
-
-      - name: Extract on server
-        run: |
-          RESPONSE=$(curl -sk -X POST "https://${{ secrets.SSH_HOST }}:2083/execute/Fileman/extract_an_archive" \
-            -H "Authorization: cpanel ${{ secrets.SSH_USER }}:${{ secrets.CPANEL_TOKEN }}" \
-            -d "dir=/home/${{ secrets.SSH_USER }}/public_html/mcguffin.dev" \
-            -d "file=deploy.tar.gz" \
-            -d "tool=tar")
-          echo "$RESPONSE"
-          echo "$RESPONSE" | grep -q '"status":1' || (echo "Extract failed" && exit 1)
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.SSH_USER }}/public_html/mcguffin.dev/"
+          rsync -avzr --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o BatchMode=yes" ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/public_html/mcguffin.dev/
