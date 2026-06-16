@@ -79,7 +79,7 @@ const GROUP_CONFIG = {
 }
 
 // ─── Table Row ─────────────────────────────────────────────
-function OppRow({ opp, flash, onContact }) {
+function OppRow({ opp, flash, onContact, even }) {
   const lcd         = maxDate(opp.lastEmailDate, opp.lastTextDate, opp.lastCallDate)
   const diff        = getDiffDays(lcd)
   const contactType = getLastContactType(opp)
@@ -87,7 +87,7 @@ function OppRow({ opp, flash, onContact }) {
   const typeClass   = contactType !== '—' ? `contact-type-${contactType.toLowerCase()}` : 'contact-type-none'
 
   return (
-    <tr className="opp-row">
+    <tr className={`opp-row${even ? ' opp-row-even' : ''}`}>
       <td className="col-name">{opp.accountName}</td>
       <td className="col-stage"><span className="stage-badge">{opp.stage}</span></td>
       <td className="col-last-contact">{dayLabel}</td>
@@ -144,12 +144,13 @@ function GroupTable({ groupKey, opps, onContact, flashMap }) {
           </tr>
         </thead>
         <tbody>
-          {sortOppList(opps, sortConfig).map(opp => (
+          {sortOppList(opps, sortConfig).map((opp, idx) => (
             <OppRow
               key={opp.id}
               opp={opp}
               flash={flashMap[opp.id]}
               onContact={onContact}
+              even={idx % 2 === 1}
             />
           ))}
         </tbody>

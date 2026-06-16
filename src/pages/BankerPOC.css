@@ -74,8 +74,8 @@
 }
 
 .pipeline-table thead th {
-  background: #1e293b;
-  color: #94a3b8;
+  background: #f3f4f6;
+  color: #6b7280;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -84,14 +84,14 @@
   text-align: center;
   cursor: pointer;
   user-select: none;
-  border-bottom: 2px solid #334155;
+  border-bottom: 2px solid #e5e7eb;
   white-space: nowrap;
   transition: background 0.15s, color 0.15s;
 }
 
 .pipeline-table thead th:hover {
-  background: #273548;
-  color: #e2e8f0;
+  background: #e9eaec;
+  color: #374151;
 }
 
 .pipeline-table thead th:last-child {
@@ -99,7 +99,7 @@
 }
 
 .sort-icon {
-  color: #334155;
+  color: #d1d5db;
   font-size: 0.8rem;
 }
 
@@ -124,10 +124,15 @@
   vertical-align: middle;
   text-align: center;
   color: #374151;
+  background: #ffffff;
+}
+
+.opp-row-even td {
+  background: #f9fafb;
 }
 
 .opp-row:hover td {
-  background: #f9fafb;
+  background: #eff6ff;
 }
 
 .col-name {
