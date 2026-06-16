@@ -1,3 +1,13 @@
+body:has(.banker-poc) {
+  background: #f3f4f6;
+}
+
+body:has(.banker-poc) #root {
+  width: 100%;
+  max-width: 100%;
+  border: none;
+}
+
 .banker-poc {
   min-height: 100vh;
   background: #ffffff;
