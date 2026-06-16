@@ -53,6 +53,17 @@ export const createTask = async (oppId, type, dateStr, notes = '') => {
   })
 }
 
+export const fetchTasksForOpportunity = async (oppId) => {
+  const query = encodeURIComponent(`
+    SELECT Id, Subject, Description, ActivityDate
+    FROM Task
+    WHERE WhatId = '${oppId}'
+    ORDER BY ActivityDate DESC
+  `)
+  const data = await apiCall(`/services/data/v59.0/query?q=${query}`)
+  return data.records
+}
+
 export const updateContactDate = async (oppId, type, dateStr) => {
   const fieldMap = {
     Email: 'LastEmailDate__c',

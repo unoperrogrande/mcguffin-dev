@@ -149,6 +149,11 @@ body:has(.banker-poc) #root {
   font-weight: 400;
   color: #000000 !important;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.col-name:hover {
+  text-decoration: underline;
 }
 
 .stage-badge {
@@ -304,6 +309,60 @@ body:has(.banker-poc) #root {
 }
 
 .modal-submit:hover { opacity: 0.9; }
+
+/* ─── Task History Modal ─────────────────────────────── */
+
+.task-modal {
+  width: 560px;
+}
+
+.task-list {
+  max-height: 380px;
+  overflow-y: auto;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-item {
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.task-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.task-item-subject {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.task-item-date {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.task-item-desc {
+  font-size: 0.82rem;
+  color: #4b5563;
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+}
+
+.task-list-empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 24px 0;
+}
 
 /* ─── States (loading / login / error) ──────────────── */
 

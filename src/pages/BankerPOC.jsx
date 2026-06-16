@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { initiateLogin, handleCallback, isAuthenticated, logout } from '../utils/auth'
-import { fetchOpportunities, createTask } from '../utils/salesforce'
+import { fetchOpportunities, createTask, fetchTasksForOpportunity } from '../utils/salesforce'
 import './BankerPOC.css'
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -18,6 +18,11 @@ const maxDate = (...dates) => {
   const valid = dates.filter(Boolean)
   if (!valid.length) return null
   return valid.reduce((a, b) => (a > b ? a : b))
+}
+
+const formatReadableDate = (dateStr) => {
+  if (!dateStr) return '—'
+  return parseLocalDate(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 const getDiffDays = (dateStr) => {
@@ -79,7 +84,7 @@ const GROUP_CONFIG = {
 }
 
 // ─── Table Row ─────────────────────────────────────────────
-function OppRow({ opp, flash, onContact, even }) {
+function OppRow({ opp, flash, onContact, onNameClick, even }) {
   const lcd         = maxDate(opp.lastEmailDate, opp.lastTextDate, opp.lastCallDate)
   const diff        = getDiffDays(lcd)
   const contactType = getLastContactType(opp)
@@ -88,7 +93,7 @@ function OppRow({ opp, flash, onContact, even }) {
 
   return (
     <tr className={`opp-row${even ? ' opp-row-even' : ''}`}>
-      <td className="col-name">{opp.accountName}</td>
+      <td className="col-name" onClick={() => onNameClick(opp.id, opp.accountName)}>{opp.accountName}</td>
       <td className="col-stage"><span className="stage-badge">{opp.stage}</span></td>
       <td className="col-last-contact">{dayLabel}</td>
       <td className={`col-contact-type ${typeClass}`}>{contactType}</td>
@@ -144,8 +149,38 @@ function ContactModal({ accountName, type, onSubmit, onClose }) {
   )
 }
 
+// ─── Task History Modal ────────────────────────────────────
+function TaskHistoryModal({ accountName, tasks, loading, error, onClose }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal task-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>{accountName}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="task-list">
+          {loading && <p className="task-list-empty">Loading...</p>}
+          {error && <p className="task-list-empty error-msg">{error}</p>}
+          {!loading && !error && tasks.length === 0 && (
+            <p className="task-list-empty">No tasks found.</p>
+          )}
+          {!loading && !error && tasks.map(task => (
+            <div className="task-item" key={task.Id}>
+              <div className="task-item-header">
+                <span className="task-item-subject">{task.Subject}</span>
+                <span className="task-item-date">{formatReadableDate(task.ActivityDate)}</span>
+              </div>
+              {task.Description && <p className="task-item-desc">{task.Description}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Group Table ───────────────────────────────────────────
-function GroupTable({ groupKey, opps, onContact, flashMap }) {
+function GroupTable({ groupKey, opps, onContact, onNameClick, flashMap }) {
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' })
   const config = GROUP_CONFIG[groupKey]
 
@@ -185,6 +220,7 @@ function GroupTable({ groupKey, opps, onContact, flashMap }) {
               opp={opp}
               flash={flashMap[opp.id]}
               onContact={onContact}
+              onNameClick={onNameClick}
               even={idx % 2 === 1}
             />
           ))}
@@ -202,6 +238,10 @@ export default function BankerPOC() {
   const [authed, setAuthed]     = useState(isAuthenticated())
   const [flashMap, setFlashMap] = useState({})
   const [modal, setModal]       = useState(null)
+  const [taskModal, setTaskModal]     = useState(null)
+  const [tasks, setTasks]             = useState([])
+  const [tasksLoading, setTasksLoading] = useState(false)
+  const [tasksError, setTasksError]   = useState(null)
 
   useEffect(() => {
     const init = async () => {
@@ -266,6 +306,21 @@ export default function BankerPOC() {
     handleContact(id, type, notes)
   }
 
+  const handleNameClick = async (id, accountName) => {
+    setTaskModal({ id, accountName })
+    setTasks([])
+    setTasksError(null)
+    setTasksLoading(true)
+    try {
+      const data = await fetchTasksForOpportunity(id)
+      setTasks(data)
+    } catch (e) {
+      setTasksError('Failed to load tasks.')
+    } finally {
+      setTasksLoading(false)
+    }
+  }
+
   const grouped = useMemo(() => {
     const groups = { today: [], week: [], month: [], older: [] }
     opps.forEach(opp => groups[getGroup(opp)].push(opp))
@@ -316,6 +371,7 @@ export default function BankerPOC() {
               groupKey={key}
               opps={grouped[key]}
               onContact={handleButtonClick}
+              onNameClick={handleNameClick}
               flashMap={flashMap}
             />
           )
@@ -327,6 +383,15 @@ export default function BankerPOC() {
           type={modal.type}
           onSubmit={handleModalSubmit}
           onClose={() => setModal(null)}
+        />
+      )}
+      {taskModal && (
+        <TaskHistoryModal
+          accountName={taskModal.accountName}
+          tasks={tasks}
+          loading={tasksLoading}
+          error={tasksError}
+          onClose={() => setTaskModal(null)}
         />
       )}
     </div>
