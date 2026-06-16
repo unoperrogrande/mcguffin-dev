@@ -413,3 +413,20 @@ body:has(.banker-poc) #root {
 }
 
 .error-msg { color: #ef4444; }
+
+/* ─── Action Toast ───────────────────────────────────── */
+
+.action-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ef4444;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+}

@@ -242,6 +242,7 @@ export default function BankerPOC() {
   const [tasks, setTasks]             = useState([])
   const [tasksLoading, setTasksLoading] = useState(false)
   const [tasksError, setTasksError]   = useState(null)
+  const [actionError, setActionError] = useState(null)
 
   useEffect(() => {
     const init = async () => {
@@ -277,6 +278,13 @@ export default function BankerPOC() {
 
   const handleContact = async (id, type, notes = '') => {
     const t = todayStr()
+    try {
+      await createTask(id, type, t, notes)
+    } catch (e) {
+      setActionError(`Failed to log ${type.toLowerCase()} — please try again.`)
+      setTimeout(() => setActionError(null), 4000)
+      return
+    }
     setFlashMap(prev => ({ ...prev, [id]: type }))
     setTimeout(() => setFlashMap(prev => { const n = { ...prev }; delete n[id]; return n }), 1500)
     setOpps(prev => prev.map(opp => {
@@ -289,11 +297,6 @@ export default function BankerPOC() {
         lastContactType: type,
       }
     }))
-    try {
-      await createTask(id, type, t, notes)
-    } catch (e) {
-      console.error('Failed to update Salesforce:', e)
-    }
   }
 
   const handleButtonClick = (id, accountName, type) => {
@@ -394,6 +397,7 @@ export default function BankerPOC() {
           onClose={() => setTaskModal(null)}
         />
       )}
+      {actionError && <div className="action-toast">{actionError}</div>}
     </div>
   )
 }
